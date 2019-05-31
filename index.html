@@ -1,0 +1,129 @@
+<%@ Page Title="Ambitious Academy | Services" Language="C#" MasterPageFile="~/master.master" AutoEventWireup="true" CodeFile="subservice.aspx.cs" Inherits="service" %>
+<%@ Import Namespace="System.Data.SqlClient" %>
+<%@ Import Namespace="System.Data.Sql" %>
+<script runat="server" language="C#">
+private static SqlConnection con = new SqlConnection("Data Source=182.50.133.111;Initial Catalog=PSIEDU;Persist Security Info=True;User ID=psiedu;Password=Milind@123");
+private static SqlConnection con2 = new SqlConnection("Data Source=182.50.133.111;Initial Catalog=PSIEDU;Persist Security Info=True;User ID=psiedu;Password=Milind@123");
+string ref_id;
+    protected void Page_Load(object sender, EventArgs e)
+    {
+       if(!IsPostBack)
+       {
+           if(Request.QueryString.Count>0)
+           {
+              ref_id=Request.QueryString["ref_id"];
+           }
+           else
+           {
+               ref_id="1";
+           }
+       }
+    }
+</script>
+<asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
+ <section id="inner-headline">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-12">
+				<ul class="breadcrumb">
+					<li><a href="default.aspx"><i class="fa fa-home"></i></a><i class="icon-angle-right"></i></li>
+					<li class="active">Services</li>
+				</ul>
+					<div class="cta-text">
+						<h2><span>आमच्या सुविधा</span></h2>
+                   	</div>
+			</div>
+		</div>
+	</div>
+	</section>
+	<section id="content">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-8">
+                <%con.Open();
+                      SqlCommand servicecmd = new SqlCommand("select *from [service] where [service_id]='"+ref_id+"'", con);
+                      SqlDataReader servicedr = servicecmd.ExecuteReader();
+                      if(servicedr.Read()){%>
+				<article>
+							<div class="post-heading">
+								<h3><a href="#"><%Response.Write(servicedr[1].ToString());%></a></h3>
+							</div>
+
+						<p>
+							<%Response.Write(servicedr[2].ToString());%>
+						</p>
+							<%if(ref_id!="2"){%>
+							<div id="post-slider" class="flexslider">
+								<ul class="slides">
+									<%con2.Open();
+                      SqlCommand subcmd = new SqlCommand("select [subservice_id],[subservice_name],[subservice_link] from [subservice] where [service_id]='"+ref_id+"'", con2);
+                      SqlDataReader subdr = subcmd.ExecuteReader();
+                      while(subdr.Read()){%>
+                                    <li>
+									<a  href="subservice.aspx?ref_id=<%Response.Write(subdr[0].ToString());%>"><img src="<%Response.Write(subdr[2].ToString());%>" alt="<%Response.Write(subdr[1].ToString());%>" /></a>
+									</li>
+                                    <%} con2.Close(); %>
+								</ul>
+							</div>
+									<%}else{%>
+							
+							
+					  <%con2.Open();
+                      SqlCommand subcmd3 = new SqlCommand("select [subservice_id],[subservice_name],[subservice_link] from [subservice] where [service_id]='"+ref_id+"'", con2);
+                      SqlDataReader subdr3 = subcmd3.ExecuteReader();
+                      int count =0;
+                      while(subdr3.Read())
+                      {
+                      count=count+1;
+                      }
+                      if(subdr3.Read()){
+                      int i=0;
+                      while(i<count) {%>
+                      if(i%3==0)
+                      {
+                      <div class="row">
+                      }
+                      <div class="col-sm-4">
+                         <a  href="subservice.aspx?ref_id=<%Response.Write(subdr3[0].ToString());%>">
+                         <img src="<%Response.Write(subdr3[2].ToString());%>" alt="<%Response.Write(subdr3[1].ToString());%>" />
+                        </a><br/>
+                        <h3><a href="<%Response.Write(subdr3[0].ToString());%>"><%Response.Write(subdr3[1].ToString());%></a></h3>
+                      </div>
+                      if(i%3==0)
+                      {
+                      </div>
+                      }
+                      i=i+1;
+                      <%}} con2.Close();%> <% }%> 
+				</article>
+                <%} con.Close(); %>
+			</div>
+			<div class="col-lg-4">
+				<aside class="right-sidebar">
+				<div class="widget">
+					<h4 class="widgetheading">आमच्या सुविधा</h4>
+					<ul class="cat">
+						<%con.Open();
+                      SqlCommand servicecmd2 = new SqlCommand("select *from [service]", con);
+                      SqlDataReader servicedr2 = servicecmd2.ExecuteReader();
+                      while(servicedr2.Read()){%>
+                        <li><strong><i class="icon-angle-right"></i><a href="service.aspx?ref_id=<%Response.Write(servicedr2[0].ToString());%>"><%Response.Write(servicedr2[1].ToString());%></a></strong></li>
+                        <ul>
+						<%con2.Open();
+                      SqlCommand subcmd2 = new SqlCommand("select *from [subservice] where[service_id]='"+servicedr2[0].ToString()+"'", con2);
+                      SqlDataReader subdr2 = subcmd2.ExecuteReader();
+                      while(subdr2.Read()){%>
+                        <li><a href="subservice.aspx?ref_id=<%Response.Write(subdr2[0].ToString());%>"><%Response.Write(subdr2[1].ToString());%></a></li>
+					<%} con2.Close(); %>	
+                    </ul>
+					<%} con.Close(); %>	
+                    </ul>
+				</div>
+				</aside>
+			</div>
+		</div>
+	</div>
+	</section>
+</asp:Content>
